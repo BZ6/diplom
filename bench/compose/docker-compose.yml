@@ -1,0 +1,153 @@
+# Single compose file with three profiles:
+#
+#   single-host : everything in one box (broker + 2 nodes). Quickest "try it".
+#   host        : broker only. For distributed mode, runs on the laptop.
+#   node        : one meshtasticd, parameterized via env. For distributed mode,
+#                 runs on each RPi.
+#
+# Env variables (only relevant for `node` profile):
+#   NODE_HWID    — unique numeric id (1001, 1002, …) — REQUIRED, must differ per node
+#   BROKER_HOST  — hostname/IP of the laptop running the broker (e.g. 192.168.1.10)
+#
+# Paths are relative to this file (bench/compose/).
+#   ../../firmware      — Meshtastic firmware repo (nodeA / nodeB Dockerfile)
+#   ../../messanger-server — Python server services
+#   ../../model         — ST-GNN + DQN model server
+
+services:
+  mosquitto:
+    profiles: [single-host, host]
+    image: eclipse-mosquitto:2
+    container_name: mesh-mosquitto
+    ports:
+      - "1883:1883"   # MQTT TCP
+      - "9001:9001"   # MQTT WebSocket (for the browser UI)
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+    restart: unless-stopped
+
+  nodeA:
+    profiles: [single-host]
+    build:
+      context: ../../firmware
+      dockerfile: Dockerfile
+    image: meshtastic-routing-hint:local
+    container_name: mesh-nodeA
+    depends_on: [mosquitto]
+    command: ["meshtasticd", "--fsdir=/var/lib/meshtasticd", "--sim", "--hwid=1001"]
+    ports:
+      - "4403:4403"
+    volumes:
+      - ./nodeA/config.yaml:/etc/meshtasticd/config.yaml:ro
+      - nodeA_data:/var/lib/meshtasticd
+    restart: unless-stopped
+
+  nodeB:
+    profiles: [single-host]
+    image: meshtastic-routing-hint:local
+    container_name: mesh-nodeB
+    depends_on: [mosquitto, nodeA]    # nodeA build runs first, nodeB reuses image
+    command: ["meshtasticd", "--fsdir=/var/lib/meshtasticd", "--sim", "--hwid=1002"]
+    ports:
+      - "4404:4403"
+    volumes:
+      - ./nodeB/config.yaml:/etc/meshtasticd/config.yaml:ro
+      - nodeB_data:/var/lib/meshtasticd
+    restart: unless-stopped
+
+  node:
+    profiles: [node]
+    build:
+      context: ../../firmware
+      dockerfile: Dockerfile
+    image: meshtastic-routing-hint:local
+    container_name: mesh-node-${NODE_HWID:-undefined}
+    command: ["meshtasticd", "--fsdir=/var/lib/meshtasticd", "--sim", "--hwid=${NODE_HWID:-0}"]
+    network_mode: host
+    volumes:
+      - ./nodeA/config.yaml:/etc/meshtasticd/config.yaml:ro
+      - node_data:/var/lib/meshtasticd
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # Python server stack — collector + graph + router share one SQLite
+  # ------------------------------------------------------------------
+
+  mesh-collector:
+    profiles: [single-host, host]
+    build:
+      context: ../../messanger-server
+      dockerfile: Dockerfile
+    image: mesh-server:local
+    container_name: mesh-collector
+    depends_on: [mosquitto]
+    command: ["python", "-m", "services.collector.collector"]
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      MESHTASTIC_DB: /var/lib/meshtastic/mesh_network.db
+    volumes:
+      - mesh_db:/var/lib/meshtastic
+    restart: unless-stopped
+
+  mesh-graph:
+    profiles: [single-host, host]
+    image: mesh-server:local
+    container_name: mesh-graph
+    depends_on: [mesh-collector]
+    command: ["python", "-m", "services.graph_service.graph_api"]
+    environment:
+      MESHTASTIC_DB: /var/lib/meshtastic/mesh_network.db
+      GRAPH_REFRESH_INTERVAL: "30"
+    volumes:
+      - mesh_db:/var/lib/meshtastic
+    restart: unless-stopped
+
+  mesh-router:
+    profiles: [single-host, host]
+    image: mesh-server:local
+    container_name: mesh-router
+    depends_on: [mesh-collector]
+    command: ["python", "-m", "services.recommendation_engine.router"]
+    environment:
+      MQTT_BROKER: mosquitto
+      MQTT_PORT: "1883"
+      MESHTASTIC_DB: /var/lib/meshtastic/mesh_network.db
+      GRAPH_REFRESH_INTERVAL: "30"
+      ML_SERVER: "http://mesh-model:8000"
+      ML_TIMEOUT: "2.0"
+    volumes:
+      - mesh_db:/var/lib/meshtastic
+    restart: unless-stopped
+
+  # ------------------------------------------------------------------
+  # ML routing model server (ST-GNN + DQN).
+  #
+  # Pre-train once before starting the stack:
+  #   docker compose --profile single-host run --rm mesh-model python train.py
+  #
+  # If weights are missing the server starts and returns HTTP 503,
+  # causing mesh-router to fall back to Dijkstra automatically.
+  # ------------------------------------------------------------------
+  mesh-model:
+    profiles: [single-host, host]
+    build:
+      context: ../../model
+      dockerfile: Dockerfile
+    image: mesh-model:local
+    container_name: mesh-model
+    ports:
+      - "8000:8000"
+    volumes:
+      - model_weights:/app/saved_model
+    environment:
+      MODEL_PATH: /app/saved_model/routing_model.pt
+      PORT: "8000"
+    restart: unless-stopped
+
+volumes:
+  nodeA_data:
+  nodeB_data:
+  node_data:
+  mesh_db:
+  model_weights:
