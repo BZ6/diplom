@@ -1,0 +1,16 @@
+=== ST-GNN+DQN ===  device=cuda
+=== Phase 1: Behavioral Cloning / KD from Dijkstra  (8000 ep) ===
+  [BC stage 1/5  N=4-12]  ep=1600  trained=100%  total=1600
+  [BC stage 2/5  N=8-20]  ep=1600  trained=100%  total=3200
+  [BC stage 3/5  N=15-40]  ep=2000  trained=100%  total=5200
+  [BC stage 4/5  N=30-70]  ep=1600  trained=100%  total=6800
+  [BC stage 5/5  N=50-100]  ep=1200  trained=100%  total=8000
+
+=== Phase 2: RL Fine-tuning with dense reward  (2000 ep) ===
+  [RL stage 1/5  N=4-12]  ep=400  win=100%  eps=0.133  total=400
+  [RL stage 2/5  N=8-20]  ep=400  win=100%  eps=0.118  total=800
+  [RL stage 3/5  N=15-40]  ep=500  win=98%  eps=0.102  total=1300
+  [RL stage 4/5  N=30-70]  ep=400  win=86%  eps=0.090  total=1700
+  [RL stage 5/5  N=50-100]  ep=300  win=72%  eps=0.082  total=2000
+
+Saved: C:\DiskZ\diplom\model\saved_model\routing_model.pt

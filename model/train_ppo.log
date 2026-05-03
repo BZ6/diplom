@@ -1,0 +1,8 @@
+=== GraphSAGE + PPO  (8000 env steps)  device=cuda ===
+  [PPO stage 1/5  N=4-12]  steps=1600  updates=4  total=1600
+  [PPO stage 2/5  N=8-20]  steps=1600  updates=4  total=3200
+  [PPO stage 3/5  N=15-40]  steps=2000  updates=4  total=5200
+  [PPO stage 4/5  N=30-70]  steps=1600  updates=4  total=6800
+  [PPO stage 5/5  N=50-100]  steps=1200  updates=3  total=8000
+
+Saved: C:\DiskZ\diplom\model\saved_model\routing_model_sage_ppo.pt

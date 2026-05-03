@@ -1,0 +1,10 @@
+C:\DiskZ\diplom\model\train_sage.py:244: UserWarning: std(): degrees of freedom is <= 0. Correction should be strictly less than the reduction factor (input numel divided by output numel). (Triggered internally at C:\actions-runner\_work\pytorch\pytorch\pytorch\aten\src\ATen\native\ReduceOps.cpp:1831.)
+  if returns_t.std() > 1e-6:
+=== GraphSAGE + REINFORCE  (8000 episodes)  device=cuda ===
+  [REINFORCE stage 1/5  N=4-12]  ep=1600  win=100%  total=1600
+  [REINFORCE stage 2/5  N=8-20]  ep=1600  win=100%  total=3200
+  [REINFORCE stage 3/5  N=15-40]  ep=2000  win=86%  total=5200
+  [REINFORCE stage 4/5  N=30-70]  ep=1600  win=53%  total=6800
+  [REINFORCE stage 5/5  N=50-100]  ep=1200  win=32%  total=8000
+
+Saved: C:\DiskZ\diplom\model\saved_model\routing_model_sage_reinforce.pt

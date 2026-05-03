@@ -1,0 +1,8 @@
+=== GNN+Dijkstra (Neural Shortest Path)  device=cuda � 8000 graphs ===
+  [ND stage 1/5  N=4-12]  graphs=1600  trained=1600  avg_loss=0.4744  total=1600
+  [ND stage 2/5  N=8-20]  graphs=1600  trained=1600  avg_loss=0.5628  total=3200
+  [ND stage 3/5  N=15-40]  graphs=2000  trained=2000  avg_loss=0.6293  total=5200
+  [ND stage 4/5  N=30-70]  graphs=1600  trained=1600  avg_loss=0.6265  total=6800
+  [ND stage 5/5  N=50-100]  graphs=1200  trained=1200  avg_loss=0.5973  total=8000
+
+Saved: C:\DiskZ\diplom\model\saved_model\routing_model_nd.pt

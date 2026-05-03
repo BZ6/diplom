@@ -268,11 +268,11 @@ def train(num_episodes: int = 5_000, save_path: str = SAVE_PATH):
         if ep % 500 == 0:
             total = wins + losses
             rate  = wins / total * 100 if total else 0.0
-            print(f"ep {ep:5d}  ε={epsilon:.3f}  win={rate:.1f}%  replay={len(replay)}")
+            print(f"ep {ep:5d}  eps={epsilon:.3f}  win={rate:.1f}%  replay={len(replay)}")
             wins = losses = 0
 
     torch.save(policy.state_dict(), save_path)
-    print(f"Saved → {save_path}")
+    print(f"Saved: {save_path}")
 
 
 if __name__ == "__main__":
