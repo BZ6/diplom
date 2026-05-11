@@ -1,0 +1,28 @@
+============================= test session starts =============================
+platform win32 -- Python 3.12.3, pytest-8.3.5, pluggy-1.5.0 -- C:\Users\bogda\AppData\Local\Programs\Python\Python312\python.exe
+cachedir: .pytest_cache
+rootdir: C:\DiskZ\diplom\model
+plugins: anyio-4.4.0
+collecting ... collected 19 items
+
+tests/test_model.py::test_build_tensors_shape PASSED                     [  5%]
+tests/test_model.py::test_build_tensors_server_flag PASSED               [ 10%]
+tests/test_model.py::test_build_tensors_no_edges PASSED                  [ 15%]
+tests/test_model.py::test_build_tensors_normalised_weights PASSED        [ 21%]
+tests/test_model.py::test_encoder_output_shape PASSED                    [ 26%]
+tests/test_model.py::test_encoder_no_edges PASSED                        [ 31%]
+tests/test_model.py::test_dqn_head_q_values_shape PASSED                 [ 36%]
+tests/test_model.py::test_route_returns_list_or_none PASSED              [ 42%]
+tests/test_model.py::test_route_same_node PASSED                         [ 47%]
+tests/test_model.py::test_route_no_path PASSED                           [ 52%]
+tests/test_model.py::test_route_endpoints PASSED                         [ 57%]
+tests/test_serve.py::test_health_returns_ok PASSED                       [ 63%]
+tests/test_serve.py::test_route_same_source_target PASSED                [ 68%]
+tests/test_serve.py::test_route_unknown_source PASSED                    [ 73%]
+tests/test_serve.py::test_route_unknown_target PASSED                    [ 78%]
+tests/test_serve.py::test_route_no_model PASSED                          [ 84%]
+tests/test_serve.py::test_route_with_mock_model PASSED                   [ 89%]
+tests/test_serve.py::test_route_no_path_from_model PASSED                [ 94%]
+tests/test_serve.py::test_health_model_loaded PASSED                     [100%]
+
+============================= 19 passed in 2.05s ==============================
