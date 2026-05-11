@@ -501,8 +501,8 @@ function Run-Test {
         -t "msh/2/json/LongFast/!000003e9" `
         -m $msgJson 2>&1 | Out-Null
 
-    Log-Info "  Ожидание рекомендации маршрута (10 сек)..."
-    Start-Sleep -Seconds 10
+    Log-Info "  Ожидание рекомендации маршрута (1 сек)..."
+    Start-Sleep -Seconds 1
     $recProc | Stop-Process -Force -ErrorAction SilentlyContinue
     [void]$recProc.WaitForExit(2000)
 
